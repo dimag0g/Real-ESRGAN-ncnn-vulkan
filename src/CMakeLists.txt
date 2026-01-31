@@ -14,9 +14,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
-project(realesrgan-ncnn-vulkan)
-
 cmake_minimum_required(VERSION 3.9)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+
+project(realesrgan-ncnn-vulkan)
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -274,11 +275,15 @@ compile_shader(realesrgan_postproc_tta.comp)
 
 add_custom_target(generate-spirv DEPENDS ${SHADER_SPV_HEX_FILES})
 
-add_executable(realesrgan-ncnn-vulkan main.cpp realesrgan.cpp)
+add_executable(${PROJECT_NAME} main.cpp realesrgan.cpp)
 
-add_dependencies(realesrgan-ncnn-vulkan generate-spirv)
+if(MINGW)
+    target_link_options(${PROJECT_NAME} PRIVATE -municode -mconsole)
+endif()
 
-set(REALESRGAN_LINK_LIBRARIES ncnn webp ${Vulkan_LIBRARY})
+add_dependencies(${PROJECT_NAME} generate-spirv)
+
+set(PROJECT_LINK_LIBRARIES ncnn webp ${Vulkan_LIBRARY})
 
 if(USE_STATIC_MOLTENVK)
     find_library(CoreFoundation NAMES CoreFoundation)
@@ -290,7 +295,7 @@ if(USE_STATIC_MOLTENVK)
     find_library(IOKit NAMES IOKit)
     find_library(IOSurface NAMES IOSurface)
 
-    list(APPEND REALESRGAN_LINK_LIBRARIES
+    list(APPEND PROJECT_LINK_LIBRARIES
         ${Metal}
         ${QuartzCore}
         ${CoreGraphics}
@@ -303,8 +308,7 @@ if(USE_STATIC_MOLTENVK)
 endif()
 
 if(OPENMP_FOUND)
-    list(APPEND REALESRGAN_LINK_LIBRARIES ${OpenMP_CXX_LIBRARIES})
+    list(APPEND PROJECT_LINK_LIBRARIES ${OpenMP_CXX_LIBRARIES})
 endif()
 
-target_link_libraries(realesrgan-ncnn-vulkan ${REALESRGAN_LINK_LIBRARIES} -static-libstdc++)
-
+target_link_libraries(${PROJECT_NAME} ${PROJECT_LINK_LIBRARIES} -static-libstdc++)
