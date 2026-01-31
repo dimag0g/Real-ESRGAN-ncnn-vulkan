@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(realesrgan-ncnn-vulkan)
 
 cmake_minimum_required(VERSION 3.9)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
 
 set(CMAKE_BUILD_TYPE Release)
 
