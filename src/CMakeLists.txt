@@ -29,6 +29,9 @@ find_package(Threads)
 find_package(OpenMP)
 find_package(Vulkan REQUIRED)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+find_package(AvisynthPlus REQUIRED)
+
 find_program(GLSLANGVALIDATOR_EXECUTABLE NAMES glslangValidator PATHS $ENV{VULKAN_SDK}/bin NO_CMAKE_FIND_ROOT_PATH)
 message(STATUS "Found glslangValidator: ${GLSLANGVALIDATOR_EXECUTABLE}")
 
@@ -148,6 +151,13 @@ if(NOT USE_SYSTEM_NCNN)
     option(NCNN_BUILD_EXAMPLES "" OFF)
     option(NCNN_DISABLE_RTTI "" ON)
     option(NCNN_DISABLE_EXCEPTION "" ON)
+    option(NCNN_INT8 "" ON)
+    option(NCNN_INT8_STORAGE "" ON)
+    option(NCNN_INT8_INFERENCE "" ON)
+
+
+
+
 
     option(WITH_LAYER_absval "" OFF)
     option(WITH_LAYER_argmax "" OFF)
@@ -230,41 +240,6 @@ if(NOT USE_SYSTEM_NCNN)
 
     add_subdirectory(ncnn)
 endif()
-
-if(USE_SYSTEM_WEBP)
-    set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-    find_package(WebP)
-    if(NOT TARGET webp)
-        message(WARNING "webp target not found! USE_SYSTEM_WEBP will be turned off.")
-        set(USE_SYSTEM_WEBP OFF)
-    endif()
-endif()
-
-if(NOT USE_SYSTEM_WEBP)
-    # build libwebp library
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libwebp/CMakeLists.txt")
-        message(FATAL_ERROR "The submodules were not downloaded! Please update submodules with \"git submodule update --init --recursive\" and try again.")
-    endif()
-
-    option(WEBP_ENABLE_SIMD "" ON)
-    option(WEBP_BUILD_ANIM_UTILS "" OFF)
-    option(WEBP_BUILD_CWEBP "" OFF)
-    option(WEBP_BUILD_DWEBP "" OFF)
-    option(WEBP_BUILD_GIF2WEBP "" OFF)
-    option(WEBP_BUILD_IMG2WEBP "" OFF)
-    option(WEBP_BUILD_VWEBP "" OFF)
-    option(WEBP_BUILD_WEBPINFO "" OFF)
-    option(WEBP_BUILD_WEBPMUX "" OFF)
-    option(WEBP_BUILD_EXTRAS "" OFF)
-    option(WEBP_BUILD_WEBP_JS "" OFF)
-    option(WEBP_NEAR_LOSSLESS "" OFF)
-    option(WEBP_ENABLE_SWAP_16BIT_CSP "" OFF)
-
-    add_subdirectory(libwebp)
-
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libwebp/src)
-endif()
-
 # look for vulkan compute shader and compile
 set(SHADER_SPV_HEX_FILES)
 
@@ -275,11 +250,16 @@ compile_shader(realesrgan_postproc_tta.comp)
 
 add_custom_target(generate-spirv DEPENDS ${SHADER_SPV_HEX_FILES})
 
-add_executable(realesrgan-ncnn-vulkan main.cpp realesrgan.cpp)
+add_library(AviSynthPlus-realesrgan SHARED plugin.cpp realesrgan.cpp)
 
-add_dependencies(realesrgan-ncnn-vulkan generate-spirv)
+set_property(TARGET AviSynthPlus-realesrgan PROPERTY CXX_STANDARD 20)
+set_source_files_properties(plugin.cpp PROPERTIES
+    COMPILE_FLAGS "-fexceptions"
+)
 
-set(REALESRGAN_LINK_LIBRARIES ncnn webp ${Vulkan_LIBRARY})
+add_dependencies(AviSynthPlus-realesrgan generate-spirv)
+
+set(REALESRGAN_LINK_LIBRARIES ncnn ${Vulkan_LIBRARY})
 
 if(USE_STATIC_MOLTENVK)
     find_library(CoreFoundation NAMES CoreFoundation)
@@ -307,5 +287,5 @@ if(OPENMP_FOUND)
     list(APPEND REALESRGAN_LINK_LIBRARIES ${OpenMP_CXX_LIBRARIES})
 endif()
 
-target_link_libraries(realesrgan-ncnn-vulkan ${REALESRGAN_LINK_LIBRARIES} -static-libstdc++)
+target_link_libraries(AviSynthPlus-realesrgan ${REALESRGAN_LINK_LIBRARIES} AvsCore -static-libstdc++)
 
