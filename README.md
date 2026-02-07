@@ -26,14 +26,12 @@ ConvertToYV12(matrix="PC.709")
 
 ### Supported parameters
 
-- `scale` = scale level, 1 = no scaling, 2 = upscale 2x
-- `model` = model directory to use, 0: "models-nose", 1: "models-pro" 2: "models-se", default = 2.
+- `scale` = scale level, 2 = upscale 2x, 4 = upscale 4x
+- `model` = model to use, 0: "realesr-general-wdn", 1: "upscayl-lite" 2: "realesr-animevideo", default = 2.
 - `tilesize` = tile size (min = 32), use smaller value to reduce GPU memory usage, default selects automatically
 - `gpu_id` = ID of GPU to use, default is zero (first available).
 - `gpu_thread` = thread count for the realcugan upscaling, using larger values increases GPU usage and consumes more GPU memory, default is one.
 - `list_gpu` = simply prints a list of available GPU devices on the frame and does nothing else.
-
-Not yet supported: `sync` = sync gap mode, 0 = no sync, 1 = accurate sync, 2 = rough sync, 3 = very rough sync
 
 
 ### Troubleshooting
