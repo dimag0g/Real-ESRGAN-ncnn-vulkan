@@ -439,7 +439,7 @@ int main(int argc, char** argv)
     int scale = 4;
     std::vector<int> tilesize;
     path_t model = PATHSTR("models");
-    path_t modelname = PATHSTR("realesr-animevideov3");
+    path_t modelname = PATHSTR("realesr-animevideo");
     std::vector<int> gpuid;
     int jobs_load = 1;
     std::vector<int> jobs_proc;
@@ -684,43 +684,20 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // if (modelname.find(PATHSTR("realesrgan-x4plus")) != path_t::npos
-    //     || modelname.find(PATHSTR("realesrnet-x4plus")) != path_t::npos
-    //     || modelname.find(PATHSTR("esrgan-x4")) != path_t::npos)
-    // {}
-    // else
-    // {
-    //     fprintf(stderr, "unknown model name\n");
-    //     return -1;
-    // }
-
 #if _WIN32
     wchar_t parampath[256];
     wchar_t modelpath[256];
 
-    if (modelname == PATHSTR("realesr-animevideov3"))
-    {
-        swprintf(parampath, 256, L"%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale));
-        swprintf(modelpath, 256, L"%s/%s-x%s.bin", model.c_str(), modelname.c_str(), std::to_string(scale));
-    }
-    else{
-        swprintf(parampath, 256, L"%s/%s.param", model.c_str(), modelname.c_str());
-        swprintf(modelpath, 256, L"%s/%s.bin", model.c_str(), modelname.c_str());
-    }
+    swprintf(parampath, 256, L"%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale));
+    swprintf(modelpath, 256, L"%s/%s.bin", model.c_str(), modelname.c_str());
 
 #else
     char parampath[256];
     char modelpath[256];
 
-    if (modelname == PATHSTR("realesr-animevideov3"))
-    {
-        sprintf(parampath, "%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale).c_str());
-        sprintf(modelpath, "%s/%s-x%s.bin", model.c_str(), modelname.c_str(), std::to_string(scale).c_str());
-    }
-    else{
-        sprintf(parampath, "%s/%s.param", model.c_str(), modelname.c_str());
-        sprintf(modelpath, "%s/%s.bin", model.c_str(), modelname.c_str());
-    }
+    sprintf(parampath, "%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale).c_str());
+    sprintf(modelpath, "%s/%s.bin", model.c_str(), modelname.c_str());
+
 #endif
 
     path_t paramfullpath = sanitize_filepath(parampath);
