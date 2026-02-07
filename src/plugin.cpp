@@ -256,24 +256,24 @@ static AVS_Value AVSC_CC Create_realesrgan(AVS_ScriptEnvironment* env, AVS_Value
 
         std::string modelDir, paramPath, modelPath;
 		
-        /*switch (model)
+        switch (model)
         {
             case 0:
             {
-                modelPath = "/models-nose";
+                modelPath = "/realesr-general-wdn";
                 break;
             }
             case 1:
             {
-                modelPath = "/models-pro";
+                modelPath = "/upscayl-lite";
                 break;
             }
             case 2:
             {
-                modelPath = "/models-se";
+                modelPath = "/realesr-animevideo";
                 break;
             }
-        }*/
+        }
 
         /*if (noise == -1)
         {
@@ -287,8 +287,8 @@ static AVS_Value AVSC_CC Create_realesrgan(AVS_ScriptEnvironment* env, AVS_Value
         }
         else*/
         {
-            paramPath = "/realesr-animevideov3-x" + std::to_string(scale) + ".param";
-            modelPath = "/realesr-animevideov3-x" + std::to_string(scale) + ".bin";
+            paramPath = modelPath + "-x" + std::to_string(scale) + ".param";
+            modelPath = modelPath + ".bin";
         }
 
         // Try current directory first
@@ -298,7 +298,7 @@ static AVS_Value AVSC_CC Create_realesrgan(AVS_ScriptEnvironment* env, AVS_Value
             modelDir = get_plugin_directory() + "/models";
             std::ifstream ifs2{ modelDir + paramPath };
             if (!ifs2.is_open())
-                throw ("failed to load model from " + modelDir).c_str();
+                throw ("couldn't find model in " + modelDir + paramPath).c_str();
             ifs2.close();
         }
         ifs.close();
