@@ -26,17 +26,30 @@ ConvertToYV12(matrix="PC.709")
 
 ### Supported parameters
 
-- `scale` = upscale level, should be between 2 and 4
+- `scale` = upscale level, should be between 2 and 4, default = 2.
 - `model` = model to use, 0: "realesr-general-wdn", 1: "upscayl-lite" 2: "realesr-animevideo", default = 2.
-- `tilesize` = tile size (min = 32), use smaller value to reduce GPU memory usage, default - fit input frame in one tile
+- `tilesize` = tile size (min = 32), use smaller value to reduce GPU memory usage, default - try to fit a frame in one tile.
 - `gpu_id` = ID of GPU to use, default is zero (first available).
-- `gpu_thread` = thread count for the realcugan upscaling, using larger values increases GPU usage and consumes more GPU memory, default is one.
+- `gpu_thread` = thread count for the realcugan upscaling, using larger values increases GPU usage and consumes more GPU memory, default = 1.
 - `list_gpu` = simply prints a list of available GPU devices on the frame and does nothing else.
 
 
 ### Troubleshooting
 
-If you increase `gpu_thread`, don't forget to tell AviSynth+ to spawn several threads for your filter:
+`vkAllocateMemory failed` means `tilesize` * `gpu_thread` is set too high, and
+you need to reduce either number to get the model fit in GPU memory.
+
+`vkQueueSubmit failed` means the GPU is already in error state due to a previous
+failure, and you need to check earlier messages to find the actual failure.
+
+In case of any other crash or error, before anything else, try upgrading your GPU driver:
+
+- Intel: https://downloadcenter.intel.com/product/80939/Graphics-Drivers
+- AMD: https://www.amd.com/en/support
+- NVIDIA: https://www.nvidia.com/Download/index.aspx
+
+If increasing `gpu_thread` doesn't result in faster processing,
+consider telling AviSynth+ to spawn several threads for your filter:
 
 ```avs
 realesrgan(scale=2, gpu_thread=2)
@@ -44,11 +57,14 @@ SetFilterMTMode("realcugan", MT_MULTI_INSTANCE)
 Prefetch(2)
 ```
 
-If you encounter a crash or error, try upgrading your GPU driver:
+If the GPU memory usage is above 70%, setting `tilesize=<frame width>` or `tilesize=<frame height>`
+sometimes improves performance by making sure the frame fits in either one or two tiles, when
+automatic tile size detection may result in splitting the frame in 4 or more tiles.
 
-- Intel: https://downloadcenter.intel.com/product/80939/Graphics-Drivers
-- AMD: https://www.amd.com/en/support
-- NVIDIA: https://www.nvidia.com/Download/index.aspx
+Of course, manually increasing the tile size only helps if the resulting GPU memory usage is below 100%,
+otherwise the processing will either crash or get much slower if system memory is used as
+as substitute for GPU memory.
+
 
 ## Build from Source
 
