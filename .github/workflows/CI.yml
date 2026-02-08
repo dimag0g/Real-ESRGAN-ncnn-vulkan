@@ -14,12 +14,20 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-vulkan-devel mingw-w64-x86_64-glslang
+        install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-git mingw-w64-x86_64-vulkan-devel mingw-w64-x86_64-glslang
+    - name: build-deps
+      shell: msys2 {0}
+      run: |
+        mkdir -p build-deps; cd build-deps
+        git clone --recurse-submodules https://github.com/AviSynth/AviSynthPlus
+        cd AviSynthPlus
+        cmake . && cmake --build . -j 2
+        cd ..
     - name: build
       shell: msys2 {0}
       run: |
         mkdir build; cd build
-        cmake ../src -DCMAKE_CXX_FLAGS="-include cstdint"
+        cmake ../src -DCMAKE_CXX_FLAGS="-include cstdint" -DAVISYNTHPLUS_ROOT_DIR=../build-deps/AviSynthPlus/avs_core
         cmake --build . -j 2
 
   ubuntu:
@@ -32,10 +40,17 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libvulkan-dev glslang-tools
+    - name: build-deps
+      run: |
+        mkdir -p build-deps; cd build-deps
+        git clone --recurse-submodules https://github.com/AviSynth/AviSynthPlus
+        cd AviSynthPlus
+        cmake . && cmake --build .
+        cd ..
     - name: build
       run: |
-        mkdir build && cd build
-        cmake ../src
+        mkdir -p build && cd build
+        cmake ../src -DAVISYNTHPLUS_ROOT_DIR=../build-deps/AviSynthPlus/avs_core
         cmake --build . -j 2
 
   macos:
@@ -47,8 +62,15 @@ jobs:
     - name: install
       run: |
         brew install vulkan-volk glslang
+    - name: build-deps
+      run: |
+        mkdir -p build-deps; cd build-deps
+        git clone --recurse-submodules https://github.com/AviSynth/AviSynthPlus
+        cd AviSynthPlus
+        cmake . && cmake --build .
+        cd ..
     - name: build
       run: |
-        mkdir build && cd build
-        cmake ../src
+        mkdir -p build && cd build
+        cmake ../src -DAVISYNTHPLUS_ROOT_DIR=../build-deps/AviSynthPlus/avs_core
         cmake --build . -j 2
