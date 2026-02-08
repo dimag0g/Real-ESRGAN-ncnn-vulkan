@@ -187,18 +187,25 @@ static AVS_Value AVSC_CC Create_realesrgan(AVS_ScriptEnvironment* env, AVS_Value
 
         const auto noise{ avs_defined(avs_array_elt(args, Noise)) ? avs_as_int(avs_array_elt(args, Noise)) : 0 };
         const auto scale{ avs_defined(avs_array_elt(args, Scale)) ? avs_as_int(avs_array_elt(args, Scale)) : 2 };
-        const auto tilesize{ avs_defined(avs_array_elt(args, Tilesize)) ? avs_as_int(avs_array_elt(args, Tilesize)) : (std::max)(d->fi->vi.width, 32) };
+        auto tilesize{ avs_defined(avs_array_elt(args, Tilesize)) ? avs_as_int(avs_array_elt(args, Tilesize)) : 0 };
         const auto model{ avs_defined(avs_array_elt(args, Model)) ? avs_as_int(avs_array_elt(args, Model)) : 2 };
         const auto gpuId{ avs_defined(avs_array_elt(args, Gpu_id)) ? avs_as_int(avs_array_elt(args, Gpu_id)) : ncnn::get_default_gpu_index() };
-        const auto gpuThread{ avs_defined(avs_array_elt(args, Gpu_thread)) ? avs_as_int(avs_array_elt(args, Gpu_thread)) : 2 };
+        const auto gpuThread{ avs_defined(avs_array_elt(args, Gpu_thread)) ? avs_as_int(avs_array_elt(args, Gpu_thread)) : 1 };
         const auto tta{ avs_defined(avs_array_elt(args, Tta)) ? avs_as_bool(avs_array_elt(args, Tta)) : 0 };
+
+        // Auto-detect tile size
+        if (tilesize == 0) {
+            int heap_budget = ncnn::get_gpu_device(gpuId)->get_heap_budget() / gpuThread;
+            heap_budget -= std::min(heap_budget - 4, 150); // at least 4
+            tilesize = (int)(sqrt(heap_budget) - 1) * 32; // at least 32
+            tilesize = std::min(d->fi->vi.width, tilesize); // don't exceed frame width
+        }
+        if (tilesize < 32) tilesize = 32;
 
         if (noise < -1 || noise > 3)
             throw "noise must be between -1 and 3 (inclusive)";
         if (scale < 2 || scale > 4)
             throw "scale must be between 2 and 4 (inclusive)";
-        if (tilesize < 32)
-            throw "tilesize must be at least 32";
         if (model < 0 || model > 2)
             throw "model must be between 0 and 2 (inclusive)";
         if (gpuId < 0 || gpuId >= ncnn::get_gpu_count())
