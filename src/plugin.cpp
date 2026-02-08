@@ -239,20 +239,7 @@ static AVS_Value AVSC_CC Create_realesrgan(AVS_ScriptEnvironment* env, AVS_Value
         d->fi->vi.width *= scale;
         d->fi->vi.height *= scale;
 
-        int prepadding{};
-
-        if (scale == 2)
-        {
-            prepadding = 18;
-        }
-        if (scale == 3)
-        {
-            prepadding = 14;
-        }
-        if (scale == 4)
-        {
-            prepadding = 19;
-        }
+        int prepadding = 18;
 
         std::string modelDir, paramPath, modelPath;
 		
