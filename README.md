@@ -1,7 +1,6 @@
 # Real-ESRGAN ncnn Vulkan
 
-![CI](https://github.com/dimag0g/Real-ESRGAN-ncnn-vulkan/workflows/CI/badge.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/dimag0g/Real-ESRGAN-ncnn-vulkan/blob/master/LICENSE)
+![CI](https://github.com/dimag0g/Real-ESRGAN-ncnn-vulkan/actions/workflows/CI.yml/badge.svg?branch=master)
 
 This project is the [ncnn](https://github.com/Tencent/ncnn) implementation of [**Real-ESRGAN**](https://github.com/xinntao/Real-ESRGAN).
 *Real-ESRGAN ncnn Vulkan* heavily borrows from [realsr-ncnn-vulkan](https://github.com/nihui/realsr-ncnn-vulkan).
