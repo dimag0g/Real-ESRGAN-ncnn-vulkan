@@ -688,7 +688,7 @@ int main(int argc, char** argv)
     wchar_t parampath[256];
     wchar_t modelpath[256];
 
-    swprintf(parampath, 256, L"%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale));
+    swprintf(parampath, 256, L"%s/%s-x%s.param", model.c_str(), modelname.c_str(), std::to_string(scale).c_str());
     swprintf(modelpath, 256, L"%s/%s.bin", model.c_str(), modelname.c_str());
 
 #else
