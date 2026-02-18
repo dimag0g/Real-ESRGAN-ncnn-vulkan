@@ -87,6 +87,11 @@ if(OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+# Suppress deprecation warning for -Ofast on clang until NCNN is fixed
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-ofast")
+endif()
+
 # enable global link time optimization
 cmake_policy(SET CMP0069 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
@@ -223,9 +228,9 @@ if(NOT USE_SYSTEM_NCNN)
     option(WITH_LAYER_mish "" OFF)
     option(WITH_LAYER_statisticspooling "" OFF)
     option(WITH_LAYER_swish "" OFF)
-    option(WITH_LAYER_gemm "" OFF)
+    option(WITH_LAYER_gemm "" ON)
     option(WITH_LAYER_groupnorm "" OFF)
-    option(WITH_LAYER_layernorm "" OFF)
+    option(WITH_LAYER_layernorm "" ON)
     option(WITH_LAYER_softplus "" OFF)
 
     add_subdirectory(ncnn)
