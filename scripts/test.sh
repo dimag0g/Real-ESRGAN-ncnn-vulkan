@@ -8,7 +8,16 @@ rm rgb.png ymc.png
 convert test.png -scale 200% ref_x2.png
 convert test.png -scale 400% ref_x4.png
 
-# Test
+# Test LIBWEBP support
+convert test.png -define webp:lossless=true test.webp
+./realesrgan-ncnn-vulkan -i test.png -o upscale.png > /dev/null || exit 1
+./realesrgan-ncnn-vulkan -i test.webp -o upscale.webp > /dev/null || exit 1
+identify -format '%wx%h\n' upscale.png
+[ "$(identify -format '%wx%h\n' upscale.png)" = "$(identify -format '%wx%h\n' upscale.webp)" ] || exit 2
+compare -metric AE upscale.png upscale.webp /dev/null 2>&1
+[ "$(compare -metric AE upscale.png upscale.webp /dev/null 2>&1 | cut -f 1 -d ' ')" -lt 1000 ] || exit 3
+
+# Test various ESRGAN models and parameters
 test_iteration=1
 while read -r scale tilesize model; do
     echo "

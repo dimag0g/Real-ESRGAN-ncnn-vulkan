@@ -14,8 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
-cmake_minimum_required(VERSION 3.9)
-set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+cmake_minimum_required(VERSION 3.10)
 
 project(realesrgan-ncnn-vulkan)
 

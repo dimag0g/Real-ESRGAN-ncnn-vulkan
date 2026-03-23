@@ -1,6 +1,10 @@
 # Visual Studio
 src/.vs
 src/out
+src/CMakeSettings.json
+
+# VS Code
+.vscode
 
 # Command line CMake
 build
